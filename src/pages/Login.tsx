@@ -25,7 +25,12 @@ export default function Login() {
     const handleSendOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        const { error } = await supabase.auth.signInWithOtp({ email });
+        const { error } = await supabase.auth.signInWithOtp({
+            email: email.trim(),
+            options: {
+                emailRedirectTo: `${window.location.origin}/auth/callback`,
+            },
+        });
         setLoading(false);
         if (error) {
             alert(error.message);
@@ -97,7 +102,7 @@ export default function Login() {
                     ) : (
                         <form onSubmit={handleVerifyOtp} className="space-y-6">
                             <div className="text-center mb-4">
-                                <p className="text-sm text-gray-300">Enter the OTP sent to {email}</p>
+                                <p className="text-sm text-gray-300">Enter the OTP sent to {email} (Check Spam)</p>
                                 <button type="button" onClick={() => setStep('email')} className="text-xs text-primary hover:underline mt-1">Change Email</button>
                             </div>
 
