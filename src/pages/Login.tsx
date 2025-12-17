@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Loader2, Heart, Sparkles } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -7,6 +7,8 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SUPPORTED_REGIONS } from '../lib/constants';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const schema = z.object({
     email: z.string().email(),
@@ -16,14 +18,23 @@ const schema = z.object({
 export default function Login() {
     const [loading, setLoading] = useState(false);
     const [sent, setSent] = useState(false);
+    const navigate = useNavigate();
+    const { user } = useAuth();
+
+    useEffect(() => {
+        if (user) {
+            navigate('/');
+        }
+    }, [user, navigate]);
+
     const { register, handleSubmit, formState: { errors } } = useForm<{ email: string }>({
         resolver: zodResolver(schema),
     });
 
     const onSubmit = async ({ email }: { email: string }) => {
         setLoading(true);
-        // Correct fix: Point to the dedicated callback route
-        const redirectTo = `${window.location.origin}/auth/callback`;
+        // Revert to origin as Supabase client now detects session automatically
+        const redirectTo = window.location.origin;
         console.log("Redirecting to:", redirectTo);
 
         const { error } = await supabase.auth.signInWithOtp({
