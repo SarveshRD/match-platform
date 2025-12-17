@@ -85,11 +85,11 @@ export default function Chat() {
         });
 
         if (activeChat.is_bot) {
-            handleBotReply(activeChat, text);
+            handleBotReply(activeChat);
         }
     };
 
-    const handleBotReply = (bot: ChatUser, userMsg: string) => {
+    const handleBotReply = (bot: ChatUser) => {
         setTimeout(async () => {
             const replies = [
                 "That's so interesting! Tell me more 😊",

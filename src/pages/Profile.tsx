@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
-import { Loader2, ArrowLeft, MapPin, Calendar, User, Edit2, LogOut } from 'lucide-react';
+import { Loader2, ArrowLeft, MapPin, User, Edit2, LogOut } from 'lucide-react';
+
 import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {

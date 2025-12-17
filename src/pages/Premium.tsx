@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
-import { Check, Shield, Zap, Heart } from 'lucide-react';
+import { Check } from 'lucide-react';
+
 import { useNavigate } from 'react-router-dom';
 
 export default function Premium() {
@@ -42,7 +43,7 @@ export default function Premium() {
             },
             prefill: {
                 name: profile?.name,
-                email: profile?.email,
+                email: user?.email,
                 contact: "9999999999"
             },
             theme: {

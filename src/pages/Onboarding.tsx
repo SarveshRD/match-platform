@@ -2,13 +2,11 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
-import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Camera, Upload } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { MALE_COUNTRIES, FEMALE_COUNTRIES, ALL_ALLOWED_COUNTRIES } from '../lib/constants';
-import { cn } from '../lib/utils'; // Assuming you have a cn utility
 
 const schema = z.object({
     name: z.string().min(2, "Name is too short"),
@@ -39,9 +37,8 @@ type FormValues = z.infer<typeof schema>;
 export default function Onboarding() {
     const { user } = useAuth();
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
 
-    const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
+    const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
         resolver: zodResolver(schema),
         defaultValues: {
             gender: 'Male',
@@ -49,7 +46,8 @@ export default function Onboarding() {
         }
     });
 
-    const gender = watch('gender');
+    // Remove unused gender watch
+
 
     const onSubmit = async (data: FormValues) => {
         if (!user) return;

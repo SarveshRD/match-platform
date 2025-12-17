@@ -161,7 +161,7 @@ export default function Discover() {
                 <motion.div
                     drag="x"
                     dragConstraints={{ left: 0, right: 0 }}
-                    onDragEnd={(e, { offset, velocity }) => {
+                    onDragEnd={(_, { offset, velocity }) => {
                         const swipe = Math.abs(offset.x) * velocity.x;
                         if (swipe < -10000) {
                             handleSwipe('left');
