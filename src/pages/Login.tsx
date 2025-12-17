@@ -106,7 +106,7 @@ export default function Login() {
                                     type="text"
                                     value={otp}
                                     onChange={(e) => setOtp(e.target.value)}
-                                    placeholder="Enter OTP Code"
+                                    placeholder="Enter 6-digit OTP"
                                     required
                                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-center tracking-widest text-xl"
                                 />
