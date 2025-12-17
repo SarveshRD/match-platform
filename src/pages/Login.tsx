@@ -20,17 +20,10 @@ export default function Login() {
         resolver: zodResolver(schema),
     });
 
-    const getRedirectUrl = () => {
-        // Hardcoded for stability - replace with your actual Vercel domain
-        if (window.location.hostname === 'localhost') {
-            return 'http://localhost:5173';
-        }
-        return 'https://match-platform-sarveshrd.vercel.app';
-    };
-
     const onSubmit = async ({ email }: { email: string }) => {
         setLoading(true);
-        const redirectTo = getRedirectUrl();
+        // Use the current domain (origin) ensures we redirect back to the correct Vercel deployment
+        const redirectTo = window.location.origin;
         console.log("Redirecting to:", redirectTo);
 
         const { error } = await supabase.auth.signInWithOtp({
