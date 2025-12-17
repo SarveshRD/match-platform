@@ -1,23 +1,18 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Loader2, Heart, Sparkles } from 'lucide-react';
-import { cn } from '../lib/utils';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2, Heart } from 'lucide-react';
 import { SUPPORTED_REGIONS } from '../lib/constants';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const schema = z.object({
-    email: z.string().email(),
-});
-
 
 export default function Login() {
     const [loading, setLoading] = useState(false);
-    const [sent, setSent] = useState(false);
+    const [step, setStep] = useState<'email' | 'otp'>('email');
+    const [email, setEmail] = useState('');
+    const [otp, setOtp] = useState('');
+
     const navigate = useNavigate();
     const { user } = useAuth();
 
@@ -27,27 +22,31 @@ export default function Login() {
         }
     }, [user, navigate]);
 
-    const { register, handleSubmit, formState: { errors } } = useForm<{ email: string }>({
-        resolver: zodResolver(schema),
-    });
-
-    const onSubmit = async ({ email }: { email: string }) => {
+    const handleSendOtp = async (e: React.FormEvent) => {
+        e.preventDefault();
         setLoading(true);
-        // Revert to origin as Supabase client now detects session automatically
-        const redirectTo = window.location.origin;
-        console.log("Redirecting to:", redirectTo);
+        const { error } = await supabase.auth.signInWithOtp({ email });
+        setLoading(false);
+        if (error) {
+            alert(error.message);
+        } else {
+            setStep('otp');
+        }
+    };
 
-        const { error } = await supabase.auth.signInWithOtp({
+    const handleVerifyOtp = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        const { error } = await supabase.auth.verifyOtp({
             email,
-            options: {
-                emailRedirectTo: redirectTo,
-            }
+            token: otp,
+            type: 'email',
         });
         setLoading(false);
         if (error) {
             alert(error.message);
         } else {
-            setSent(true);
+            navigate('/');
         }
     };
 
@@ -74,26 +73,17 @@ export default function Login() {
                         Connecting Indian Gentlemen with Eligible Ladies from specific global regions.
                     </p>
 
-                    {sent ? (
-                        <div className="text-center space-y-4">
-                            <div className="flex justify-center">
-                                <Sparkles className="w-12 h-12 text-yellow-500 animate-pulse" />
-                            </div>
-                            <p className="text-white">Check your email for the magic link.</p>
-                        </div>
-                    ) : (
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                    {step === 'email' ? (
+                        <form onSubmit={handleSendOtp} className="space-y-6">
                             <div>
                                 <input
-                                    {...register('email')}
                                     type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     placeholder="Enter your email"
-                                    className={cn(
-                                        "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all",
-                                        errors.email && "border-red-500 focus:ring-red-500"
-                                    )}
+                                    required
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                                 />
-                                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                             </div>
 
                             <button
@@ -101,7 +91,33 @@ export default function Login() {
                                 disabled={loading}
                                 className="w-full bg-gradient-to-r from-primary to-rose-600 text-white font-medium py-3 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center disabled:opacity-50 shadow-[0_0_20px_-5px_rgba(236,72,153,0.7)]"
                             >
-                                {loading ? <Loader2 className="animate-spin w-5 h-5" /> : "Sign In with Email"}
+                                {loading ? <Loader2 className="animate-spin w-5 h-5" /> : "Send OTP"}
+                            </button>
+                        </form>
+                    ) : (
+                        <form onSubmit={handleVerifyOtp} className="space-y-6">
+                            <div className="text-center mb-4">
+                                <p className="text-sm text-gray-300">Enter the OTP sent to {email}</p>
+                                <button type="button" onClick={() => setStep('email')} className="text-xs text-primary hover:underline mt-1">Change Email</button>
+                            </div>
+
+                            <div>
+                                <input
+                                    type="text"
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value)}
+                                    placeholder="Enter 6-digit OTP"
+                                    required
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-center tracking-widest text-xl"
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-gradient-to-r from-primary to-rose-600 text-white font-medium py-3 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center disabled:opacity-50 shadow-[0_0_20px_-5px_rgba(236,72,153,0.7)]"
+                            >
+                                {loading ? <Loader2 className="animate-spin w-5 h-5" /> : "Verify & Login"}
                             </button>
                         </form>
                     )}
