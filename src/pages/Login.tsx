@@ -22,8 +22,8 @@ export default function Login() {
 
     const onSubmit = async ({ email }: { email: string }) => {
         setLoading(true);
-        // Use the current domain (origin) ensures we redirect back to the correct Vercel deployment
-        const redirectTo = window.location.origin;
+        // Correct fix: Point to the dedicated callback route
+        const redirectTo = `${window.location.origin}/auth/callback`;
         console.log("Redirecting to:", redirectTo);
 
         const { error } = await supabase.auth.signInWithOtp({

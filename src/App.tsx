@@ -19,10 +19,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+import AuthCallback from './pages/auth/callback';
+
 function App() {
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-primary selection:text-white">
       <Routes>
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/login" element={<Login />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
