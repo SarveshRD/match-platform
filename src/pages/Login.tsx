@@ -22,7 +22,12 @@ export default function Login() {
 
     const onSubmit = async ({ email }: { email: string }) => {
         setLoading(true);
-        const { error } = await supabase.auth.signInWithOtp({ email });
+        const { error } = await supabase.auth.signInWithOtp({
+            email,
+            options: {
+                emailRedirectTo: window.location.origin,
+            }
+        });
         setLoading(false);
         if (error) {
             alert(error.message);
